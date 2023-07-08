@@ -1,79 +1,108 @@
 import React, { useState } from 'react';
-import { Bar, Pie } from 'react-chartjs-2';
+import { VictoryBar, VictoryChart, VictoryAxis, VictoryTheme } from 'victory';
 import '../../../src/GroupPage.css';
 
-
 const GroupPage = () => {
-  const [activeCard, setActiveCard] = useState(null);
+  const [selectedGroup, setSelectedGroup] = useState(null);
 
-  const handleCardClick = (cardIndex) => {
-    setActiveCard(cardIndex);
+  const groups = [
+    {
+      name: 'A',
+      marks: {
+        english: 90,
+        marathi: 85,
+        hindi: 80
+      }
+    },
+    {
+      name: 'B',
+      marks: {
+        english: 75,
+        marathi: 80,
+        hindi: 95
+      }
+    },
+    {
+      name: 'C',
+      marks: {
+        english: 85,
+        marathi: 90,
+        hindi: 75
+      }
+    }
+  ];
+
+  const disability = [
+    {
+      disability_count:1,
+      student_count:3,
+      disability_type:"physical"
+    },
+    {
+      disability_count:1,
+      student_count:3,
+      disability_type:"visual"
+    },
+    {
+      disability_count:1,
+      student_count:3,
+      disability_type:"mental"
+    },
+  ]
+
+  const handleCardClick = (groupName) => {
+    setSelectedGroup(groupName);
+  };
+
+  const renderGroupCards = () => {
+    return groups.map((group) => (
+      <div
+        key={group.name}
+        onClick={() => handleCardClick(group.name)}
+        className={`group-card ${selectedGroup === group.name ? 'selected' : ''}`}
+      >
+        <h3>Group {group.name}</h3>
+        {/* <p>English: {group.marks.english}</p>
+        <p>Marathi: {group.marks.marathi}</p>
+        <p>Hindi: {group.marks.hindi}</p> */}
+      </div>
+    ));
   };
 
   const renderBarChart = () => {
-    if (activeCard === null) return null;
+  if (selectedGroup) {
+    const selectedGroupData = groups.find((group) => group.name === selectedGroup);
+    const { english, marathi, hindi } = selectedGroupData.marks;
 
-    const barChartData = {
-      labels: ['Label 1', 'Label 2', 'Label 3', 'Label 4', 'Label 5'],
-      datasets: [
-        {
-          label: 'Bar Chart Data',
-          data: [12, 19, 3, 5, 2],
-          backgroundColor: 'rgba(75, 192, 192, 0.6)',
-          borderColor: 'rgba(75, 192, 192, 1)',
-          borderWidth: 1,
-        },
-      ],
-    };
+    const data = [
+      { subject: 'English', marks: english },
+      { subject: 'Marathi', marks: marathi },
+      { subject: 'Hindi', marks: hindi }
+    ];
 
     return (
-      <div className="chart">
-        <h3>Bar Chart</h3>
-        <Bar data={barChartData} />
+      <div className="bar-chart-container" >
+        <VictoryChart
+          theme={VictoryTheme.material}
+        >
+          <VictoryAxis dependentAxis />
+          <VictoryAxis tickFormat={['English', 'Marathi', 'Hindi']} />
+          <VictoryBar data={data} x="subject" y="marks" />
+        </VictoryChart>
       </div>
     );
-  };
+  }
+  return null;
+};
 
-  const renderPieChart = () => {
-    if (activeCard === null) return null;
-
-    const pieChartData = {
-      labels: ['Label 1', 'Label 2', 'Label 3'],
-      datasets: [
-        {
-          label: 'Pie Chart Data',
-          data: [30, 40, 30],
-          backgroundColor: ['rgba(255, 99, 132, 0.6)', 'rgba(54, 162, 235, 0.6)', 'rgba(255, 206, 86, 0.6)'],
-          borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)'],
-          borderWidth: 1,
-        },
-      ],
-    };
-
-    return (
-      <div className="chart">
-        <h3>Pie Chart</h3>
-        <Pie data={pieChartData} />
-      </div>
-    );
-  };
 
   return (
-    <div className="chart-page">
-      <h2>Chart Page</h2>
-      <div className="card-container">
-        {[1, 2, 3, 4, 5, 6].map((cardIndex) => (
-          <div
-            key={cardIndex}
-            className={`card ${activeCard === cardIndex ? 'active' : ''}`}
-            onClick={() => handleCardClick(cardIndex)}
-          >
-            Card {cardIndex}
-          </div>
-        ))}
+    <div>
+      <h2>Group Page</h2>
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        {renderGroupCards()}
       </div>
       {renderBarChart()}
-      {renderPieChart()}
     </div>
   );
 };
